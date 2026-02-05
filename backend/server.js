@@ -7,14 +7,18 @@ const productRoutes = require("./routes/product.routes");
 
 const app = express();
 
-app.use(cors());
+// CORS configuration for production
+app.use(cors({
+  origin: ['https://frontend-8k6glgc7n-manishamahajan2003s-projects.vercel.app', 
+           'https://frontend-one-delta-44.vercel.app'],
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
+// API routes
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
-
-app.use('/api/categories', require('./routes/category.routes'));
-app.use('/api/products', require('./routes/product.routes'));
 
 // Utility endpoint to reset all IDs to start from 1
 app.post('/api/reset-ids', (req, res) => {
@@ -117,6 +121,8 @@ app.post('/api/init-db', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
