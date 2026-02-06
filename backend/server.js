@@ -7,10 +7,13 @@ const productRoutes = require("./routes/product.routes");
 
 const app = express();
 
-// CORS configuration for production
+// CORS configuration for development and production
 app.use(cors({
-  origin: ['https://frontend-8k6glgc7n-manishamahajan2003s-projects.vercel.app', 
-           'https://frontend-one-delta-44.vercel.app'],
+  origin: [
+    'http://localhost:4200',
+    'https://frontend-8k6glgc7n-manishamahajan2003s-projects.vercel.app', 
+    'https://frontend-one-delta-44.vercel.app'
+  ],
   credentials: true
 }));
 
