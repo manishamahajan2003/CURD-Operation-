@@ -1,0 +1,174 @@
+<div class="p-4 sm:p-6 bg-gray-100 min-h-screen">
+  <div class="bg-white p-4 sm:p-6 rounded-lg shadow max-w-full sm:max-w-4xl mx-auto">
+
+    <h2 class="text-lg sm:text-xl font-bold mb-4">Product Master</h2>
+
+    <!-- Notification Display -->
+    <div *ngIf="notification" 
+         [class]="notificationType === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'"
+         class="p-3 mb-4 rounded-lg border text-sm font-medium">
+      {{ notification }}
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+      <input
+        [(ngModel)]="productName"
+        type="text"
+        placeholder="Product Name"
+        class="flex-1 border px-3 py-2 rounded text-sm sm:text-base"
+      />
+
+      <select
+        [(ngModel)]="categoryId"
+        class="flex-1 border px-3 py-2 rounded text-sm sm:text-base">
+        <option value="">Select Category</option>
+        <option *ngFor="let c of categories" [value]="c.categoryId">
+          {{ c.categoryName }}
+        </option>
+      </select>
+
+      <div class="flex gap-2 sm:gap-3">
+        <button
+          *ngIf="!editMode"
+          (click)="addProduct()"
+          class="bg-blue-600 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Add
+        </button>
+
+        <button
+          *ngIf="editMode"
+          (click)="updateProduct()"
+          class="bg-green-600 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Update
+        </button>
+
+        <button
+          *ngIf="editMode"
+          (click)="reset()"
+          class="bg-gray-500 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border text-xs sm:text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="border px-1 sm:px-2 py-1">Product ID</th>
+            <th class="border px-1 sm:px-2 py-1">Product Name</th>
+            <th class="border px-1 sm:px-2 py-1">Category ID</th>
+            <th class="border px-1 sm:px-2 py-1">Category Name</th>
+            <th class="border px-1 sm:px-2 py-1">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of products">
+            <td class="border px-1 sm:px-2 py-1">{{ p.productId }}</td>
+            <td class="border px-1 sm:px-2 py-1">{{ p.productName }}</td>
+            <td class="border px-1 sm:px-2 py-1">{{ p.categoryId }}</td>
+            <td class="border px-1 sm:px-2 py-1">{{ p.categoryName }}</td>
+            <td class="border px-1 sm:px-2 py-1">
+              <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                <button
+                  (click)="editProduct(p)"
+                  class="bg-yellow-500 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Edit
+                </button>
+                <button
+                  *ngIf="editMode && selectedId === p.productId"
+                  (click)="updateProduct()"
+                  class="bg-green-600 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Update
+                </button>
+                <button
+                  (click)="deleteProduct(p.productId)"
+                  class="bg-red-600 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="products.length === 0">
+            <td colspan="5" class="text-center py-3">
+              No products found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-4 flex flex-col items-center space-y-4" *ngIf="totalPages > 1">
+      <!-- Page Size Selector -->
+      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <label class="text-sm font-medium">Items per page:</label>
+        <select 
+          [(ngModel)]="pageSize" 
+          (change)="onPageSizeChange(pageSize)"
+          class="border px-2 py-1 rounded text-sm">
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+        </select>
+        <span class="text-sm text-gray-600">
+          Showing {{ getStartItem() }} - 
+          {{ getEndItem() }} of {{ totalItems }} items
+        </span>
+      </div>
+
+      <!-- Page Navigation -->
+      <div class="flex flex-wrap justify-center items-center gap-1 sm:gap-2">
+        <!-- First Page -->
+        <button 
+          (click)="onPageChange(1)"
+          [disabled]="currentPage === 1"
+          class="px-2 py-1 sm:px-3 border rounded text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100">
+          First
+        </button>
+
+        <!-- Previous Page -->
+        <button 
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="currentPage === 1"
+          class="px-2 py-1 sm:px-3 border rounded text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100">
+          Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          (click)="onPageChange(page)"
+          [class]="currentPage === page ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'"
+          class="px-2 py-1 sm:px-3 border rounded text-xs sm:text-sm hover:bg-gray-100">
+          {{ page }}
+        </button>
+
+        <!-- Next Page -->
+        <button 
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="currentPage === totalPages"
+          class="px-2 py-1 sm:px-3 border rounded text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100">
+          Next
+        </button>
+
+        <!-- Last Page -->
+        <button 
+          (click)="onPageChange(totalPages)"
+          [disabled]="currentPage === totalPages"
+          class="px-2 py-1 sm:px-3 border rounded text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100">
+          Last
+        </button>
+      </div>
+
+      <!-- Page Info -->
+      <div class="text-sm text-gray-600">
+        Page {{ currentPage }} of {{ totalPages }}
+      </div>
+    </div>
+
+  </div>
+</div>

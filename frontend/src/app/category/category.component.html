@@ -1,0 +1,85 @@
+<div class="p-4 sm:p-6 bg-gray-100 min-h-screen">
+  <div class="bg-white p-4 sm:p-6 rounded-lg shadow max-w-full sm:max-w-3xl mx-auto">
+
+    <h2 class="text-lg sm:text-xl font-bold mb-4">Category Master</h2>
+
+    <!-- Notification Display -->
+    <div *ngIf="notification" 
+         [class]="notificationType === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700'"
+         class="p-3 mb-4 rounded-lg border text-sm font-medium">
+      {{ notification }}
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+      <input
+        [(ngModel)]="categoryName"
+        type="text"
+        placeholder="Category Name"
+        class="flex-1 border px-3 py-2 rounded text-sm sm:text-base"
+      />
+
+      <div class="flex gap-2 sm:gap-3">
+        <button
+          *ngIf="!editMode"
+          (click)="addCategory()"
+          class="bg-blue-600 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Add
+        </button>
+
+        <button
+          *ngIf="editMode"
+          (click)="updateCategory()"
+          class="bg-green-600 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Update
+        </button>
+
+        <button
+          *ngIf="editMode"
+          (click)="reset()"
+          class="bg-gray-500 text-white px-3 py-2 sm:px-4 rounded text-sm sm:text-base">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border text-xs sm:text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="border px-1 sm:px-2 py-1">ID</th>
+            <th class="border px-1 sm:px-2 py-1">Name</th>
+            <th class="border px-1 sm:px-2 py-1">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let cat of categories; let i = index">
+            <td class="border px-1 sm:px-2 py-1">{{ cat.categoryId }}</td>
+            <td class="border px-1 sm:px-2 py-1">{{ cat.categoryName }}</td>
+            <td class="border px-1 sm:px-2 py-1">
+              <div class="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                <button
+                  (click)="editCategory(cat)"
+                  class="bg-yellow-500 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Edit
+                </button>
+                <button
+                  *ngIf="editMode && selectedId === cat.categoryId"
+                  (click)="updateCategory()"
+                  class="bg-green-600 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Update
+                </button>
+                <button
+                  (click)="deleteCategory(cat.categoryId)"
+                  class="bg-red-600 text-white px-2 py-1 rounded text-xs sm:text-sm">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
